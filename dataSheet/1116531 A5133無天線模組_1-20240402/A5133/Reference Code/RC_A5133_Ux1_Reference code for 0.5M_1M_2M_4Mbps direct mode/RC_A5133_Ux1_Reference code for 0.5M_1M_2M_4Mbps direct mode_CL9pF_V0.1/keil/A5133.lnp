@@ -1,0 +1,4 @@
+".\Main.obj",
+".\Uti.obj" 
+TO "A5133" 
+RAMSIZE(256) 

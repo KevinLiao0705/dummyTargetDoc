@@ -1,0 +1,71 @@
+#ifndef _GLOBALVAR_H_
+#define _GLOBALVAR_H_
+
+#ifdef _MAIN_C_
+/************************************************************************
+**  Global Variable Declaration
+************************************************************************/
+Uint8		data 	   timer;
+Uint16   data     TimerCnt;
+Uint8		data     Slot_TX;
+Uint8		data 	   Flag_Timeout;
+Uint16	idata 	RxCnt;
+Uint8    data    *Uartptr;
+Uint8		data	   UartSendCnt;
+Uint8		data	   CmdBuf[25];
+Uint8		idata	   tmpbuf[80];
+Uint16	idata 	Err_Loss;
+Uint16   idata    Err_Frame;
+Uint32	idata	   Err_BitCnt;
+Uint8		data	   Flag_Report;
+Uint8    idata    Flag_FirstLink;
+Uint8    idata    Flag_MASTER;
+
+const Uint8 code BitCount_Tab[16] = {0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4};
+//const Uint8 //code ID_Tab[8]={0x34,0x75,0xC5,0x2A,0xC7,0x33,0x45,0xEA}; //ID code
+const Uint8 code ID_Tab[8]={0x55,0x55,0x55,0x55,0x34,0x75,0xC5,0x6A}; //ID2 code
+//const Uint8 code ID_Tab[8]={0xFF,0xFF,0xFF,0xFF,0x36,0x75,0xC5,0xBA}; //ID2 code
+//const Uint8 code ID_Tab[8]={0x34,0x75,0xC5,0x2A,0x34,0x75,0xC5,0x2A}; //ID2 code
+const Uint8 code KeyData_Tab[16]={0x00,0x00,0x00,0x00,0x00,0x0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; //keyData code
+const Uint8 code FCB_Tab[20]={0x00,0x00,0x00,0x00,0x00,0x15,0x20,0x25,0x30,0x35,0x40,0x45,0x50,0x55,0x60,0x65,0x70,0x75,0x80,0x85}; //keyData code
+const Uint8 code PN9_Tab[]=
+{   0xFF,0x83,0xDF,0x17,0x32,0x09,0x4E,0xD1,
+    0xE7,0xCD,0x8A,0x91,0xC6,0xD5,0xC4,0xC4,
+    0x40,0x21,0x18,0x4E,0x55,0x86,0xF4,0xDC,
+    0x8A,0x15,0xA7,0xEC,0x92,0xDF,0x93,0x53,
+    0x30,0x18,0xCA,0x34,0xBF,0xA2,0xC7,0x59,
+    0x67,0x8F,0xBA,0x0D,0x6D,0xD8,0x2D,0x7D,
+    0x54,0x0A,0x57,0x97,0x70,0x39,0xD2,0x7A,
+    0xEA,0x24,0x33,0x85,0xED,0x9A,0x1D,0xE0,
+};
+
+#else 
+/************************************************************************
+**  Extern Global Variable Declaration
+************************************************************************/
+extern Uint8   data 	   timer;
+extern Uint16  data     TimerCnt;
+extern Uint8	data     Slot_TX;
+extern Uint8	data 	   Flag_Timeout;
+extern Uint16	idata 	RxCnt;
+extern Uint8   data    *Uartptr;
+extern Uint8	data	   UartSendCnt;
+extern Uint8	data	   CmdBuf[25];
+extern Uint8	idata	   tmpbuf[80];
+extern Uint16	idata 	Err_Loss;
+extern Uint16  idata    Err_Frame;
+extern Uint32	idata	   Err_BitCnt;
+extern Uint8	data	   Flag_Report;
+extern Uint8   idata    Flag_FirstLink;
+extern Uint8	data	   Flag_MASTER;
+
+extern  const Uint8 code BitCount_Tab[16];
+extern  const Uint8 code ID_Tab[8];
+extern  const Uint8 code KeyData_Tab[];
+extern  const Uint8 code FCB_Tab[];
+extern  const Uint8 code PN9_Tab[];
+
+#endif
+
+#endif
+
