@@ -415,7 +415,7 @@ SIGNAL HB_com_typ		:std_logic;
 
 
 ---------------------------------------------------------------
-SIGNAL Hvg_tim_off:std_logic_Vector(15 downto 0);	--Host VG offset
+SIGNAL Hvg_tim_off:std_logic_Vector(15 downto 0);	--Host VG offset <rfout aftaer pretrig high>
 SIGNAL Hvg_tim:std_logic_Vector(15 downto 0);		--Host VG time
 SIGNAL Hvgout_tim:std_logic_Vector(15 downto 0);	--Hvg out period
 SIGNAL Hvgout_en_f:std_logic;						--Hvg out enable time
@@ -849,7 +849,7 @@ BEGIN
 			HB_rf_en<='1';
 			local_f<='0';
 				
-			Hvg_tim_off<="0001"&"1001"&"0000"&"0000";
+			Hvg_tim_off<="0001"&"1001"&"0000"&"0000";--80us
 			Svgrt_tim_off<="0001"&"1001"&"0000"&"0000";
 			Svgrx_tim_off<="0000"&"0100"&"1101"&"0010";
 			
@@ -898,13 +898,13 @@ BEGIN
 								HA_com_typ		<=mAreg(13)(6);					--s1通訊方式(0:光纖, 1:無線)
 								HB_com_typ		<=mAreg(13)(7);					--s2通訊方式(0:光纖, 1:無線)
 								
-								Hvg_tim_off		<=mAreg(14)&mAreg(15);
-								Svgrt_tim_off	<=mAreg(16)&mAreg(17);
+								Hvg_tim_off		<=mAreg(14)&mAreg(15);			--host 時間同步VGO偏移
+								Svgrt_tim_off	<=mAreg(16)&mAreg(17);			--slave 時間同步VGO偏移(received hrtime adjust)
 
-								Svgrx_bas_off	<=mAreg(18)&mAreg(19);
-								Svgrx_dly_off	<=mAreg(20)&mAreg(21);
-								Svgrt_delt_lim	<=mAreg(22)&mAreg(23);
-								Svgrt_adj_off	<=mAreg(24)&mAreg(25);--fix
+								Svgrx_bas_off	<=mAreg(18)&mAreg(19);			--固定同步延時
+								Svgrx_dly_off	<=mAreg(20)&mAreg(21);			--傳輸路徑延時
+								Svgrt_delt_lim	<=mAreg(22)&mAreg(23);			--時間同步最大誤差(when timeDelta over this ,set srtime immitiatly)
+								Svgrt_adj_off	<=mAreg(24)&mAreg(25);--fix		--時間修正偏移
 								
 								fblp1_off_h		<=mAreg(28)&mAreg(29);
 								fblp2_off_h		<=mAreg(30)&mAreg(31);
@@ -944,9 +944,9 @@ BEGIN
 								w_fblp2_off_h   <=fblp2_off_h+40;
 								w_fblp2_off_l   <=fblp2_off_h+600;
 								rbuf<=Hvg_tim_off-6400;
-								Svgrx_tim_off<=Svgrx_bas_off-Svgrx_dly_off;
+								Svgrx_tim_off<=Svgrx_bas_off-Svgrx_dly_off;--(固定同步延時-傳輸路徑延時)
 								if(contst_vgin_pri<159999)then
-							      contst_vgin_pri <="00100111000011111111";
+							      contst_vgin_pri <="0010 0111 0000 1111 1111";
 							    else  
 								  contst_vgin_pri<=contst_vgin_pri-1;
 								end if;  
@@ -1738,7 +1738,7 @@ lprxp2:rlpproc
 				end if;
 				--------------------------------------------------
 				if(Svgout_en_f='1') and (Svgout_en_tim="0000000000000100")then
-					if(syn_rxrt_mode_f='1')then
+					if(syn_rxrt_mode_f='1')then			--同步法則(0:自動, 1:固定延時)
 						Svgrt_delt<=Svgrx_tim-Svgrt_tim;
 						Svgrt_adj<=Svgrt_tim-Svgrx_tim_off;
 						svgrt_delt_data<=Svgrx_tim-Svgrt_tim;
@@ -1911,8 +1911,8 @@ lprxp2:rlpproc
 					end if;
 					
 				    if(lvgout_tim=80000)then	--1ms
-						if(nout32(15 downto 0)<20000)then
-							lvgout_tlim<="00100111000100000000";--2ms
+						if(nout32(15 downto 0)<20000)then --2ms
+							lvgout_tlim<="0010 0111 0001 0000 0000";--2ms
 						else
 							lvgout_tlim(19)<='0';
 							lvgout_tlim(18 downto 0)<=nout32(15 downto 0) &"000";
@@ -2120,7 +2120,7 @@ lprxp2:rlpproc
 
 --only host use
 ---------------------------------------------------
---generate Hvgout_f
+--generate Hvgout_f  <rfout>
 ---------------------------------------------------
 	PROCESS(clkA)
   	BEGIN
@@ -2484,6 +2484,7 @@ lprxp2:rlpproc
 
 
 --load Atx_data
+--Hvideo_gate =>preTrig 
 -----------------------------------------------------	
 	PROCESS(clkA,Hdata_gate,Hvideo_gate)
   	BEGIN
@@ -2507,7 +2508,7 @@ lprxp2:rlpproc
 					Btx_data3<=Btx_count;
 					Btx_data4<=Hrtime_cnt;
 					---------------------------------------
-					Hvg_tim<=Hrtime_cnt+Hvg_tim_off;
+					Hvg_tim<=Hrtime_cnt+Hvg_tim_off;--rfout time
 					Hvgout_en_tim<="0000000000000000";
 					Hvgout_en_f<='0';
 					A1588_start<=Hrtime_cnt;
